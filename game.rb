@@ -28,6 +28,8 @@
 # -define win condition
 # -play the game
 
+require 'byebug'
+
 class Player
   attr_accessor :name, :lives
 
@@ -53,7 +55,7 @@ end
 
 class Game
 
-  attr_accessor :player1, :player2
+  attr_accessor :player1
 
   def initialize
     @player1 = Player.new("Player 1")
@@ -62,17 +64,39 @@ class Game
     @question = Question.new
   end
 
-  def play
-    answer = @question.generate_question
-    player_answer = gets.chomp.to_i
-    if player_answer != answer
-      @current_player.lives -= 1
-      puts "Incorrect. You have #{@current_player.lives} lives left."
+
+  def game_over?
+    @player1.lives == 0 || @player2.lives == 0
+  end
+
+  def switch_player
+    #if the switch
+    if @current_player == @player1
+      @current_player = @player2
     else
-      puts "Correct. You have #{@current_player.lives} lives left."
+      @current_player = @player1
     end
   end
+
+  def play
+    # byebug
+    until game_over?
+      puts "it is your turn now #{@current_player.name}"
+      answer = @question.generate_question
+      # puts "answer #{answer}"
+      player_answer = gets.chomp.to_i
+      if player_answer != answer
+        @current_player.lives -= 1
+        puts "Incorrect #{@current_player.name}. You have #{@current_player.lives} lives left."
+      else
+        puts "Correct #{@current_player.name}. You have #{@current_player.lives} lives left."
+      end
+      switch_player
+    end
+    puts "Congrats #{@current_player.name}! You win"
+  end
 end
+
 
 game = Game.new
 game.play
